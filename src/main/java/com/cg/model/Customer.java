@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "customers")
 @Accessors(chain = true)
-public class Customer extends BaseEntity implements Validator {
+public class Customer extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,37 +41,6 @@ public class Customer extends BaseEntity implements Validator {
     @JoinColumn(name = "location_region_id", referencedColumnName = "id", nullable = false)
     private LocationRegion locationRegion;
 
-
-    @Override
-    public boolean supports(Class<?> clazz) {
-        return Customer.class.isAssignableFrom(clazz);
-    }
-
-    @Override
-    public void validate(Object target, Errors errors) {
-        Customer customer = (Customer) target;
-
-        String fullName = customer.getFullName();
-        String email = customer.getEmail();
-
-        if (fullName.length() == 0) {
-            errors.rejectValue("fullName", "fullName.null");
-        }
-        else {
-            if (fullName.length() < 4 || fullName.length() > 25) {
-                errors.rejectValue("fullName", "fullName.length");
-            }
-        }
-
-        if (email.length() == 0) {
-            errors.rejectValue("email", "email.null");
-        }
-        else {
-            if (!email.matches("^[\\w]+@([\\w-]+\\.)+[\\w-]{2,6}$")) {
-                errors.rejectValue("email", "email.matches");
-            }
-        }
-    }
 
     public CustomerDTO toCustomerDTO() {
         return new CustomerDTO()

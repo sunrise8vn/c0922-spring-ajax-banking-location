@@ -16,8 +16,8 @@ thead {
 }
 
 footer {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
+    padding: 10px 0;
+    background-color: #7abde8;
     color: #fff;
     position: fixed;
     bottom: 0;
@@ -56,10 +56,33 @@ footer ul.container li {
     border-color: #f5c2c7;
 }
 
+.modal-alert-danger label {
+    display: list-item;
+}
+
 label.error {
     display: list-item;
 }
 
 input.error {
     border: solid 1px red;
+}
+
+
+table td span.select-tab {
+    border-left-width: 7px;
+    border-left-style: solid;
+    min-width: 0;
+    display: block;
+    height: 24px;
+    margin: 0 0 0 -4px;
+    padding: 0;
+}
+
+table td span.selected {
+    border-left-color: #5cb85c;
+}
+
+table td span.unselected {
+    border-left-color: #dfdfdf;
 }

@@ -41,25 +41,6 @@ public class CustomerController {
     }
 
 
-    @PostMapping("/create")
-    public String doCreate(@ModelAttribute Customer customer, BindingResult bindingResult, Model model) {
-
-        new Customer().validate(customer, bindingResult);
-
-        if (bindingResult.hasFieldErrors()) {
-            model.addAttribute("customer", customer);
-            model.addAttribute("error", true);
-            return "customer/create";
-        }
-
-        customer.setBalance(BigDecimal.ZERO);
-        customerService.save(customer);
-        model.addAttribute("success", true);
-        model.addAttribute("messages", "Create customer successful");
-
-        return "customer/create";
-    }
-
     @PostMapping("/update/{id}")
     public String doUpdate(@PathVariable Long id, @ModelAttribute Customer customer, Model model) {
 
