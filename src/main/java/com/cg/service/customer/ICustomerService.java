@@ -8,6 +8,7 @@ import com.cg.service.IGeneralService;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 public interface ICustomerService extends IGeneralService<Customer> {
 
@@ -18,6 +19,8 @@ public interface ICustomerService extends IGeneralService<Customer> {
     List<Customer> findAllByIdNot(Long id);
 
     List<Customer> findAllByIdNotAndDeletedIsFalse(Long id);
+
+    Optional<Customer> findByEmail(String email);
 
     void incrementBalance(Long customerId, BigDecimal transactionAmount);
 

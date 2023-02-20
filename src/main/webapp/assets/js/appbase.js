@@ -79,9 +79,9 @@ class Customer {
 }
 
 class Deposit {
-    constructor(id, fullName, transactionAmount) {
+    constructor(id, customerId, transactionAmount) {
         this.id = id;
-        this.fullName = fullName;
+        this.customerId = customerId;
         this.transactionAmount = transactionAmount;
     }
 }

@@ -1,11 +1,14 @@
 package com.cg.api;
 
 
+import com.cg.exception.DataInputException;
+import com.cg.exception.EmailExistsException;
 import com.cg.exception.ResourceNotFoundException;
 import com.cg.model.Customer;
 import com.cg.model.Deposit;
 import com.cg.model.LocationRegion;
 import com.cg.model.dto.CustomerDTO;
+import com.cg.model.dto.DepositDTO;
 import com.cg.model.dto.LocationRegionDTO;
 import com.cg.service.customer.ICustomerService;
 import com.cg.utils.AppUtils;
@@ -55,12 +58,22 @@ public class CustomerAPI {
     }
 
     @PostMapping
-    public ResponseEntity<?> doCreate(@RequestBody CustomerDTO customerDTO, BindingResult bindingResult) {
+    public ResponseEntity<?> doCreate(@Validated @RequestBody CustomerDTO customerDTO, BindingResult bindingResult) {
 
         new CustomerDTO().validate(customerDTO, bindingResult);
 
+//        LocationRegionDTO locationRegionDTO = customerDTO.getLocationRegion();
+
+//        new LocationRegionDTO().validate(locationRegionDTO, bindingResult);
+
         if (bindingResult.hasFieldErrors()) {
             return appUtils.mapErrorToResponse(bindingResult);
+        }
+
+        Optional<Customer> customerOptional = customerService.findByEmail(customerDTO.getEmail());
+
+        if (customerOptional.isPresent()) {
+            throw new EmailExistsException("Email entered is existed");
         }
 
         customerDTO.setId(null);
@@ -73,8 +86,21 @@ public class CustomerAPI {
     }
 
     @PostMapping("/deposit/{customerId}")
-    public ResponseEntity<?> doDeposit(@RequestBody Deposit deposit) {
+    public ResponseEntity<?> doDeposit(@PathVariable Long customerId, @RequestBody DepositDTO depositDTO) {
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        Optional<Customer> customerOptional = customerService.findById(customerId);
+
+        if (!customerOptional.isPresent()) {
+            throw new DataInputException("Customer not valid");
+        }
+
+        Deposit deposit = depositDTO.toDeposit(customerOptional.get());
+
+        customerService.deposit(deposit);
+
+        Customer newCustomer = deposit.getCustomer();
+        CustomerDTO newCustomerDTO = newCustomer.toCustomerDTO();
+
+        return new ResponseEntity<>(newCustomerDTO, HttpStatus.OK);
     }
 }

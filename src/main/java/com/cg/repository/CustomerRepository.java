@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 
 @Repository
@@ -33,6 +34,8 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     List<Customer> findAllByIdNot(Long id);
 
     List<Customer> findAllByIdNotAndDeletedIsFalse(Long id);
+
+    Optional<Customer> findByEmail(String email);
 
     @Modifying
     @Query("UPDATE Customer AS c SET c.balance = c.balance + :transactionAmount WHERE c.id = :customerId")

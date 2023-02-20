@@ -205,7 +205,7 @@
                 findCustomerById: AppBase.DOMAIN_API + "/customers",
                 createCustomer: AppBase.API_CUSTOMER,
                 updateCustomerById: AppBase.DOMAIN_API + "/customers",
-                doDeposit: AppBase.DOMAIN_API + '/deposits',
+                doDeposit: AppBase.API_CUSTOMER + '/deposit',
                 deleteDeposit: AppBase.DOMAIN_API + '/deposits',
                 deleteCustomerById: AppBase.DOMAIN_API + "/customers"
             },
@@ -386,7 +386,7 @@
 
         let updateCustomerById = (obj) => {
             customers.filter(item => {
-                if (item.id == obj.id) {
+                if (item.id === obj.id) {
                     item.fullName = obj.fullName;
                     item.email = obj.email;
                     item.phone = obj.phone;
@@ -637,22 +637,25 @@
             let newBalance = currentBalance + transactionAmountDep;
             currentCustomer.balance = newBalance;
 
-            deposit.fullName = currentCustomer.fullName;
+            // deposit.fullName = currentCustomer.fullName;
+            deposit.customerId = currentCustomer.id;
             deposit.transactionAmount = transactionAmountDep;
 
-            page.dialogs.commands.createDeposit().then((data) => {
-                page.dialogs.commands.incrementCustomerBalance(currentCustomer).then(() => {
-                    AppBase.SweetAlert.showSuccessAlert('Deposit success');
-                })
-                    .catch(() => {
-                        page.dialogs.commands.deleteDeposit(deposit);
+            page.dialogs.commands.createDeposit();
 
-                        AppBase.SweetAlert.showErrorAlert('Update customer fail');
-                    });
-            })
-                .catch(() => {
-                    AppBase.SweetAlert.showErrorAlert('Deposit fail');
-                });
+            // page.dialogs.commands.createDeposit().then((data) => {
+            //     page.dialogs.commands.incrementCustomerBalance(currentCustomer).then(() => {
+            //         AppBase.SweetAlert.showSuccessAlert('Deposit success');
+            //     })
+            //         .catch(() => {
+            //             page.dialogs.commands.deleteDeposit(deposit);
+            //
+            //             AppBase.SweetAlert.showErrorAlert('Update customer fail');
+            //         });
+            // })
+            //     .catch(() => {
+            //         AppBase.SweetAlert.showErrorAlert('Deposit fail');
+            //     });
         }
 
         page.dialogs.commands.createDeposit = () => {
@@ -662,12 +665,27 @@
                     'content-type': 'application/json'
                 },
                 type: 'POST',
-                url: page.urls.doDeposit,
+                url: page.urls.doDeposit + '/' + currentCustomerId,
                 data: JSON.stringify(deposit)
             })
                 .done((data) => {
-                    deposit = data;
+                    customer = data;
+                    locationRegion = customer.locationRegion;
+
+                    let currentRow = $('#tr_' + customer.id);
+
+                    let newRow = renderCustomer(customer, locationRegion);
+                    currentRow.replaceWith(newRow);
+
+                    AppBase.SweetAlert.showSuccessAlert('Deposit success');
                 })
+            .fail((jqXHR) => {
+                let errors = jqXHR.responseJSON;
+
+                let message = errors.message;
+
+                AppBase.SweetAlert.showErrorAlert(message);
+            })
         }
 
         page.dialogs.commands.incrementCustomerBalance = (customer) => {
